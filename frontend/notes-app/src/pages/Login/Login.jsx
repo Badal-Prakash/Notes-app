@@ -1,25 +1,52 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
-import { Link } from "react-router-dom";
 import PasswordInp from "../../components/PasswordInp/PasswordInp";
 import { validateEmail } from "../../utils/helper";
+import AxiosInstance from "./../../utils/Axios";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, seterror] = useState(null);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateEmail(email)) {
-      seterror("entert a valid email");
+      setError("Enter a valid email.");
       return;
     }
     if (!password) {
-      seterror("entert a valid password");
+      setError("Enter a valid password.");
       return;
     }
-    seterror("");
+    setError("");
+
+    try {
+      const response = await AxiosInstance.post("/login", {
+        email: email,
+        password: password,
+      });
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        console.log("login successful");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
+
   return (
     <>
       <Navbar />
@@ -38,12 +65,10 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button type="submit" className="btn-primary">
               Login
             </button>
-
             <p className="text-sm text-center mt-4">
               Not registered yet?{" "}
               <Link to="/signup" className="font-medium text-primary underline">

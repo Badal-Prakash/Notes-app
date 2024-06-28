@@ -1,30 +1,74 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import NoteCard from "../../components/Cards/NoteCard";
 import { MdAdd } from "react-icons/md";
 import AddeditNotes from "./AddeditNotes";
 import Modal from "react-modal";
+import { useNavigate } from "react-router-dom";
+import AxiosInstance from "../../utils/Axios";
+
 function Home() {
   const [openAddEditmodal, setopenAddEditmodal] = useState({
     isShown: false,
     type: "add",
     data: null,
   });
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState(null);
+  const [allnotes, setallNotes] = useState([]);
+
+  const getUserInfo = async () => {
+    try {
+      const response = await AxiosInstance.get("/user");
+      if (response.data && response.data.user) {
+        setUserInfo(response.data.user);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        localStorage.clear();
+        navigate("/login");
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
+    }
+  };
+
+  const getallNotes = async () => {
+    try {
+      const response = await AxiosInstance.get("/all-notes");
+      {
+        console.log(response.data);
+      }
+      if (response.data && response.data.notes) {
+        setallNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log("an unexpected error occurred:", error);
+    }
+  };
+  useEffect(() => {
+    getallNotes();
+    getUserInfo();
+    return () => {};
+  }, []);
   return (
     <>
-      <Navbar />
+      <Navbar userInfo={userInfo} />
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8">
-          <NoteCard
-            title="Meetuing on 7 april"
-            date="23 april 2024"
-            content="Meetuing on 7 april"
-            tags="#meeting"
-            isPinned={true}
-            onEdit={() => {}}
-            onDelete={() => {}}
-            onPinNote={() => {}}
-          />
+          {allnotes.map((note) => (
+            <NoteCard
+              key={note._id}
+              title={note.title}
+              date={note.created_on}
+              content={note.content}
+              tags={note.tags}
+              isPinned={note.isPinned}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              onPinNote={() => {}}
+            />
+          ))}
         </div>
       </div>
       <button
@@ -50,7 +94,6 @@ function Home() {
         <AddeditNotes
           type={openAddEditmodal.type}
           noteData={openAddEditmodal.data}
-          
           onClose={() => {
             setopenAddEditmodal({ isShown: false, type: "add", data: null });
           }}

@@ -25,6 +25,28 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+exports.getUser = async (req, res) => {
+  try {
+    const { user } = req.user;
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "No user information found in request" });
+    }
+    const isUser = await User.findOne({ _id: user._id });
+    if (!isUser) {
+      return res.status(401).json({ message: "Unauthorized: User not found" });
+    }
+
+    return res.status(200).json({
+      user: isUser,
+      message: "User fetched successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 exports.createAccount = async (req, res) => {
   const { fullName, email, password } = req.body;

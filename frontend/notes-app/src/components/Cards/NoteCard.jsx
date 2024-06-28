@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import { MdOutlinePushPin } from "react-icons/md";
 import { MdEdit, MdCreate, MdDeleteForever } from "react-icons/md";
 function NoteCard({
@@ -16,7 +17,9 @@ function NoteCard({
       <div className="flex items-center justify-between">
         <div className="">
           <h6 className="text-sm font-medium">{title}</h6>
-          <span className="text-sm text-slate-500">{date}</span>
+          <span className="text-sm text-slate-500">
+            {moment(date).format("DD MM YYYY")}
+          </span>
         </div>
         <MdOutlinePushPin
           className={`icon-btn ${isPinned ? "text-primary" : "text-slate-300"}`}
@@ -25,7 +28,13 @@ function NoteCard({
       </div>
       <p className="text-xs mt-2 text-slate-600">{content?.slice(0, 60)}</p>
       <div className="flex items-center justify-between mt-2">
-        <div className="text-sm text-slate-500">{tags}</div>
+        <div className="text-sm text-slate-500">
+          {/* {tags.map((item) => (
+            <span key={item}>{`#${item}`}</span>
+          ))} */}
+
+          {tags.map((item) => `#${item}`)}
+        </div>
         <div className="flex items-center gap-2">
           <MdCreate
             className="icon-btn hover:text-green-600 cursor-pointer"

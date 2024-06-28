@@ -2,10 +2,11 @@ import ProfileInfo from "../Cards/ProfileInfo";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import { useState } from "react";
-function Navbar() {
+function Navbar({ userInfo }) {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const OnLogout = () => {
+    localStorage.clear();
     navigate("/login");
   };
   const handleSearch = () => {};
@@ -23,7 +24,7 @@ function Navbar() {
         onClearSearch={onClearSearch}
         handlesearch={handleSearch}
       />
-      <ProfileInfo onLogout={OnLogout} />
+      <ProfileInfo userInfo={userInfo} onLogout={OnLogout} />
     </div>
   );
 }

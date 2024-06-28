@@ -22,7 +22,8 @@ app.get("/", (req, res) => {
   });
 });
 app.get("/users", userController.getAllUsers);
-app.post("/create-account", userController.createAccount);
+app.get("/user", authenticateToken, userController.getUser);
+app.post("/signup", userController.createAccount);
 app.post("/login", userController.login);
 app.post("/add-notes", authenticateToken, notesController.addNote);
 app.put("/edit-note/:id", authenticateToken, notesController.editNotes);
