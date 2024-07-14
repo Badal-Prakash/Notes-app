@@ -2,15 +2,21 @@ const Note = require("./../models/notes.model");
 exports.getAllNote = async (req, res) => {
   try {
     const { user } = req.user;
-    console.log(user._id);
     const notes = await Note.find({ userId: user._id }).sort({
       isPinned: -1,
     });
-    return res.status(200).json({
-      length: notes.length,
-      status: "success",
-      notes,
-    });
+    if (notes) {
+      return res.status(200).json({
+        length: notes.length,
+        status: "success",
+        notes,
+      });
+    } else {
+      return res.status(200).json({
+        length: notes.length,
+        status: "success",
+      });
+    }
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
